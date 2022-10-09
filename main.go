@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"os"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
@@ -22,11 +24,18 @@ var GitCommit string
 // GoVersion to set Go version at compilation time
 var GoVersion string
 
+func init() {
+	log.SetOutput(os.Stdout)
+}
+
 func main() {
 
 	config := NewConfig()
 
 	version := flag.Bool("version", false, "Print version and exit")
+	quiet := flag.Bool("quiet", false, "Log errors only")
+	verbose := flag.Bool("verbose", false, "Print more logs")
+	debug := flag.Bool("debug", false, "Print even more logs")
 	configFile := flag.String("config", "", "Configuration file")
 	flag.StringVar(&config.Driver, "driver", "postgres", "Database driver (postgres or mysql)")
 	flag.IntVar(&config.Connections, "connections", 1, "Number of concurrent connections to the database")
@@ -47,6 +56,17 @@ func main() {
 		return
 	}
 
+	log.SetLevel(log.WarnLevel)
+	if *debug {
+		log.SetLevel(log.DebugLevel)
+	}
+	if *verbose {
+		log.SetLevel(log.InfoLevel)
+	}
+	if *quiet {
+		log.SetLevel(log.ErrorLevel)
+	}
+
 	if *configFile != "" {
 		err := config.Read(*configFile)
 		if err != nil {
@@ -61,8 +81,8 @@ func main() {
 		log.Fatalf("Cannot perform benchmark: %v", err)
 	}
 	benchmark.Run()
-	log.Printf("Queries: %.0f", benchmark.Queries())
-	log.Printf("Queries per second: %.0f", benchmark.QueriesPerSecond())
+	fmt.Printf("Queries: %.0f\n", benchmark.Queries())
+	fmt.Printf("Queries per second: %.0f\n", benchmark.QueriesPerSecond())
 }
 
 func showVersion() {
