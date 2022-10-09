@@ -19,7 +19,7 @@ Compile the `benchito` binary:
 make
 ```
 
-Start databases instance:
+Start database instances:
 
 ```
 docker-compose pull
