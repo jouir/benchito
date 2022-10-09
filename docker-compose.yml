@@ -1,0 +1,32 @@
+---
+version: "3"
+
+services:
+
+  postgresql:
+    container_name: benchito-postgresql
+    env_file:
+      - ./postgresql.env
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    volumes:
+      - benchito-postgresql:/var/lib/postgresql/data
+    restart: always
+
+  mysql:
+    container_name: benchito-mysql
+    env_file:
+      - ./mysql.env
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - benchito-mysql:/var/lib/mysql
+    restart: always
+
+volumes:
+  benchito-postgresql:
+    driver: local
+  benchito-mysql:
+    driver: local

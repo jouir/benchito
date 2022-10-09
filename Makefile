@@ -1,0 +1,18 @@
+APPVERSION := $(shell cat ./VERSION)
+GOVERSION := $(shell go version | awk '{print $$3}')
+GITCOMMIT := $(shell git log -1 --oneline | awk '{print $$1}')
+LDFLAGS = -X main.AppVersion=${APPVERSION} -X main.GoVersion=${GOVERSION} -X main.GitCommit=${GITCOMMIT}
+PLATFORM := $(shell uname -s)
+ARCH := $(shell uname -m)
+
+.PHONY: clean
+
+build:
+	go build -ldflags "${LDFLAGS}" -o bin/benchito *.go
+
+release:
+	go build -ldflags "${LDFLAGS}" -o bin/benchito-${APPVERSION}-${PLATFORM}-${ARCH} *.go
+	sha256sum bin/benchito-${APPVERSION}-${PLATFORM}-${ARCH}
+
+clean:
+	rm -rf bin
