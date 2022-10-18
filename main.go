@@ -83,6 +83,8 @@ func main() {
 	benchmark.Run()
 	fmt.Printf("Queries: %.0f\n", benchmark.Queries())
 	fmt.Printf("Queries per second: %.0f\n", benchmark.QueriesPerSecond())
+	fmt.Printf("Average query time: %s\n", benchmark.AverageQueryTime())
+	fmt.Printf("Average query time (ms): %d\n", benchmark.AverageQueryTime().Milliseconds())
 }
 
 func showVersion() {

@@ -3,6 +3,8 @@ package main
 import (
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Benchmark to store benchmark state
@@ -42,6 +44,7 @@ func (b *Benchmark) Run() {
 // Queries returns the number of executed queries during the benchmark
 func (b *Benchmark) Queries() (queries float64) {
 	for _, database := range b.databases {
+		log.Debugf("Connection %s: Queries: %.f", database.ID, database.Queries())
 		queries = queries + database.Queries()
 	}
 	return
@@ -50,4 +53,15 @@ func (b *Benchmark) Queries() (queries float64) {
 // QueriesPerSecond returns the number of executed queries per second during the benchmark
 func (b *Benchmark) QueriesPerSecond() float64 {
 	return b.Queries() / b.duration.Seconds()
+}
+
+// AverageQueryTime computes the average query execution time for all databases connections in the benchmark
+func (b *Benchmark) AverageQueryTime() time.Duration {
+	var latencies time.Duration
+	for _, database := range b.databases {
+		log.Debugf("Connection %s: Latency: %s", database.ID, database.AverageQueryTime())
+		latencies = latencies + database.AverageQueryTime()
+	}
+	latency := int64(latencies) / int64(len(b.databases))
+	return time.Duration(latency)
 }

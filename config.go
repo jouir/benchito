@@ -97,14 +97,15 @@ func (c *Config) parsePostgresDSN() string {
 
 func (c *Config) parseMysqlDSN() (dsn string) {
 	config := mysql.NewConfig()
+	config.Timeout = 1 * time.Second
 	config.Addr = c.Host
 	if c.Port != 0 {
+		config.Net = "tcp"
 		config.Addr += fmt.Sprintf(":%d", c.Port)
 	}
 	config.User = c.User
 	config.Passwd = c.Password
 	config.DBName = c.Database
 	config.TLSConfig = c.TLS
-
 	return config.FormatDSN()
 }
